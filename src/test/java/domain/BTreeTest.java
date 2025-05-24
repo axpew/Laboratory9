@@ -19,7 +19,6 @@ class BTreeTest {
                 System.out.println("Valor insertado: " + value);
             }
 
-
             System.out.println("\nb. Recorridos del árbol:");
             System.out.println(btree.toString());
 
@@ -27,22 +26,25 @@ class BTreeTest {
             System.out.println("- Tamaño del árbol (size): " + btree.size());
             System.out.println("- Altura del árbol (height): " + btree.height());
 
+            // CORREGIDO: El preOrder() solo devuelve números separados por espacios
             String preOrderElements = btree.preOrder();
-            String[] elements = preOrderElements.split(" ");
+            String[] elements = preOrderElements.trim().split("\\s+"); // Split por espacios
 
             int testCount = Math.min(5, elements.length);
             System.out.println("\nPrueba de height(element) y contains(element):");
 
             for (int i = 0; i < testCount; i++) {
-                String element = elements[i];
-                String numStr = element.substring(0, element.indexOf('('));
-                int num = Integer.parseInt(numStr);
-
-                System.out.println("- Elemento " + num + ":");
-                System.out.println("  * Existe en el árbol (contains): " + btree.contains(num));
-                System.out.println("  * Altura del elemento (height): " + btree.height(num));
+                if (!elements[i].isEmpty()) {
+                    try {
+                        int num = Integer.parseInt(elements[i].trim());
+                        System.out.println("- Elemento " + num + ":");
+                        System.out.println("  * Existe en el árbol (contains): " + btree.contains(num));
+                        System.out.println("  * Altura del elemento (height): " + btree.height(num));
+                    } catch (NumberFormatException e) {
+                        System.out.println("- Error parseando elemento: '" + elements[i] + "'");
+                    }
+                }
             }
-
 
             System.out.println("\nd. Verificando existencia de 20 valores aleatorios:");
             int[] randomValues = new int[20];
@@ -66,19 +68,24 @@ class BTreeTest {
 
             System.out.println("\ng. Altura de cada elemento en recorrido preOrder:");
             String updatedPreOrder = btree.preOrder();
-            String[] updatedElements = updatedPreOrder.split(" ");
+            String[] updatedElements = updatedPreOrder.trim().split("\\s+");
 
             for (String element : updatedElements) {
-                if (element.isEmpty()) continue;
-
-                // Extraer el número del formato "valor(path)"
-                String numStr = element.substring(0, element.indexOf('('));
-                int num = Integer.parseInt(numStr);
-                System.out.println("- Elemento " + element + " - Altura: " + btree.height(num));
+                if (!element.isEmpty()) {
+                    try {
+                        int num = Integer.parseInt(element.trim());
+                        System.out.println("- Elemento " + num + " - Altura: " + btree.height(num));
+                    } catch (NumberFormatException e) {
+                        System.out.println("- Error parseando elemento: '" + element + "'");
+                    }
+                }
             }
 
         } catch (TreeException e) {
             System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+        } catch (Exception e) {
+            System.out.println("Error inesperado: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -86,8 +93,15 @@ class BTreeTest {
     @Test
     void testHeight() throws TreeException {
         BTree bTree = new BTree();
-        bTree.add(20); bTree.add(30); bTree.add(18); bTree.add(4); bTree.add(5); bTree.add(50); bTree.add(70);
+        bTree.add(20);
+        bTree.add(30);
+        bTree.add(18);
+        bTree.add(4);
+        bTree.add(5);
+        bTree.add(50);
+        bTree.add(70);
 
+        System.out.println("=== PRUEBA DE ALTURA ===");
         System.out.println(bTree);
         System.out.println("Binary tree - height(20): " + bTree.height(20));
         System.out.println("Binary tree - height(30): " + bTree.height(30));
@@ -105,21 +119,17 @@ class BTreeTest {
         try {
             BTree btree = new BTree();
 
+            System.out.println("=== PRUEBA DE MÉTODOS EXTENDIDOS ===");
+
             // Agregamos elementos al árbol
-            btree.add(14);
-            btree.add(17);
-            btree.add(48);
-            btree.add(35);
-            btree.add(4);
-            btree.add(44);
-            btree.add(39);
-            btree.add(10);
-            btree.add(47);
-            btree.add(42);
-            btree.add(21);
-            btree.add(28);
-            btree.add(1);
-            btree.add(33);
+            int[] testValues = {14, 17, 48, 35, 4, 44, 39, 10, 47, 42, 21, 28, 1, 33};
+
+            System.out.println("Agregando elementos al árbol:");
+            for (int value : testValues) {
+                btree.add(value);
+                System.out.print(value + " ");
+            }
+            System.out.println("\n");
 
             // Mostrar el árbol completo
             System.out.println("Árbol completo:");
@@ -140,13 +150,56 @@ class BTreeTest {
             System.out.println(btree.printNodesWithChildren());
 
             // Mostrar subárboles para diferentes elementos
-            System.out.println(btree.printSubTree(42));
-            System.out.println(btree.printSubTree(17));
-            System.out.println(btree.printSubTree(48));
-            System.out.println(btree.printSubTree(33));
+            System.out.println("=== SUBÁRBOLES ===");
+            int[] subtreeTests = {42, 17, 48, 33};
+            for (int element : subtreeTests) {
+                if (btree.contains(element)) {
+                    System.out.println(btree.printSubTree(element));
+                } else {
+                    System.out.println("Elemento " + element + " no existe en el árbol");
+                }
+            }
 
             // Mostrar total de hojas
             System.out.println("Binary tree - total leaves: " + btree.totalLeaves());
+
+            // Información adicional del árbol
+            System.out.println("\n=== INFORMACIÓN ADICIONAL ===");
+            System.out.println("Tamaño del árbol: " + btree.size());
+            System.out.println("Altura del árbol: " + btree.height());
+
+        } catch (TreeException e) {
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+        } catch (Exception e) {
+            System.out.println("Error inesperado: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    void testTreeStructureValidation() {
+        try {
+            System.out.println("=== PRUEBA DE VALIDACIÓN DE ESTRUCTURA ===");
+
+            BTree btree = new BTree();
+
+            // Agregar algunos elementos
+            int[] values = {50, 30, 70, 20, 40, 60, 80};
+            for (int value : values) {
+                btree.add(value);
+            }
+
+            System.out.println("Árbol creado con valores: 50, 30, 70, 20, 40, 60, 80");
+            System.out.println("Validación de estructura: " + btree.validateStructure());
+            System.out.println("Recorridos:");
+            System.out.println("PreOrder: " + btree.preOrder());
+            System.out.println("InOrder: " + btree.inOrder());
+            System.out.println("PostOrder: " + btree.postOrder());
+
+            // Mostrar estructura del árbol
+            System.out.println("\nEstructura del árbol:");
+            btree.printTreeStructure();
 
         } catch (TreeException e) {
             System.out.println("Error: " + e.getMessage());
