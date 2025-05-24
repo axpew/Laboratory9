@@ -17,8 +17,8 @@ import java.util.Map;
 
 public class TreeVisualizer {
     private static final int NODE_RADIUS = 18;
-    private static final int LEVEL_HEIGHT = 75;
-    private static final int MIN_HORIZONTAL_SPACING = 100;
+    private static final int LEVEL_HEIGHT = 70; // Aumentado para mejor separación
+    private static final int MIN_HORIZONTAL_SPACING = 90; // Aumentado para evitar superposiciones
     private static final Color NODE_COLOR = Color.LIGHTBLUE;
     private static final Color NODE_BORDER_COLOR = Color.DARKBLUE;
     private static final Color LINE_COLOR = Color.BLACK;
@@ -46,10 +46,22 @@ public class TreeVisualizer {
                 return;
             }
 
-            Map<BTreeNode, NodePosition> positions = calculatePositions(root);
+            // Calcular dimensiones necesarias
+            int treeHeight = tree.height();
+            int nodeCount = tree.size();
 
-            // Primero dibujar las conexiones (líneas)
-            drawConnections(pane, root, positions, new java.util.HashSet<>());
+            // Calcular dimensiones dinámicas
+            double requiredHeight = calculateRequiredHeight(treeHeight);
+            double requiredWidth = calculateRequiredWidth(nodeCount, treeHeight);
+
+            // Ajustar el tamaño del pane
+            pane.setPrefSize(requiredWidth, requiredHeight);
+            pane.setMinSize(requiredWidth, requiredHeight);
+
+            Map<BTreeNode, NodePosition> positions = calculatePositions(root, requiredWidth);
+
+            // Primero dibujar las conexiones (líneas) - CORREGIDO
+            drawConnections(pane, root, positions);
 
             // Luego dibujar los nodos encima
             drawNodes(pane, positions);
@@ -69,6 +81,7 @@ public class TreeVisualizer {
 
         BTreeNode root = getRoot(tree);
         int height = tree.height();
+        int nodeCount = tree.size();
 
         // Validar estructura
         if (!validateTreeStructure(root)) {
@@ -79,12 +92,20 @@ public class TreeVisualizer {
             return;
         }
 
+        // Calcular dimensiones necesarias
+        double requiredHeight = calculateRequiredHeight(height);
+        double requiredWidth = calculateRequiredWidth(nodeCount, height);
+
+        // Ajustar el tamaño del pane
+        pane.setPrefSize(requiredWidth, requiredHeight);
+        pane.setMinSize(requiredWidth, requiredHeight);
+
         // Primero dibujar las líneas de nivel
-        drawLevelLines(pane, height);
+        drawLevelLines(pane, height, requiredWidth);
 
         // Luego dibujar el árbol
-        Map<BTreeNode, NodePosition> positions = calculatePositions(root);
-        drawConnections(pane, root, positions, new java.util.HashSet<>());
+        Map<BTreeNode, NodePosition> positions = calculatePositions(root, requiredWidth);
+        drawConnections(pane, root, positions);
         drawNodes(pane, positions);
     }
 
@@ -100,6 +121,8 @@ public class TreeVisualizer {
         }
 
         BTreeNode root = getRoot(tree);
+        int height = tree.height();
+        int nodeCount = tree.size();
 
         // Validar estructura
         if (!validateTreeStructure(root)) {
@@ -110,10 +133,18 @@ public class TreeVisualizer {
             return;
         }
 
-        Map<BTreeNode, NodePosition> positions = calculatePositions(root);
+        // Calcular dimensiones necesarias
+        double requiredHeight = calculateRequiredHeight(height) + 50; // Extra espacio para el texto del tour
+        double requiredWidth = calculateRequiredWidth(nodeCount, height);
+
+        // Ajustar el tamaño del pane
+        pane.setPrefSize(requiredWidth, requiredHeight);
+        pane.setMinSize(requiredWidth, requiredHeight);
+
+        Map<BTreeNode, NodePosition> positions = calculatePositions(root, requiredWidth);
 
         // Dibujar conexiones
-        drawConnections(pane, root, positions, new java.util.HashSet<>());
+        drawConnections(pane, root, positions);
 
         // Dibujar nodos
         drawNodes(pane, positions);
@@ -135,11 +166,28 @@ public class TreeVisualizer {
                 break;
         }
 
-        Text tourText = new Text(30, pane.getPrefHeight() - 20,
+        Text tourText = new Text(30, requiredHeight - 20,
                 tourType.toUpperCase() + " Tour: " + tourResult);
         tourText.setFont(Font.font("Arial", FontWeight.BOLD, 14));
         tourText.setFill(Color.DARKGREEN);
         pane.getChildren().add(tourText);
+    }
+
+    // Método para calcular la altura necesaria basada en la altura del árbol
+    private double calculateRequiredHeight(int treeHeight) {
+        // Espacio para el primer nivel + (altura del árbol * espacio entre niveles) + margen inferior
+        return 45 + (treeHeight * LEVEL_HEIGHT) + 100;
+    }
+
+    // Método para calcular el ancho necesario basado en el número de nodos y altura
+    private double calculateRequiredWidth(int nodeCount, int treeHeight) {
+        // Estimación: más nodos requieren más espacio horizontal
+        // En el peor caso, todos los nodos estarían en el último nivel
+        int maxNodesInLevel = (int) Math.pow(2, treeHeight);
+        double requiredWidth = Math.max(1200, maxNodesInLevel * MIN_HORIZONTAL_SPACING * 0.8);
+
+        // Limitar a un máximo razonable para evitar que sea demasiado ancho
+        return Math.min(requiredWidth, 2500);
     }
 
     private BTreeNode getRoot(BTree tree) {
@@ -153,8 +201,10 @@ public class TreeVisualizer {
         }
     }
 
-    // Validar que cada nodo tenga máximo un padre
+    // Validar que cada nodo tenga máximo un padre - SIMPLIFICADO
     private boolean validateTreeStructure(BTreeNode root) {
+        if (root == null) return true;
+
         java.util.Set<BTreeNode> visited = new java.util.HashSet<>();
         return validateNode(root, visited, null);
     }
@@ -175,15 +225,15 @@ public class TreeVisualizer {
                 validateNode(node.right, visited, node);
     }
 
-    private Map<BTreeNode, NodePosition> calculatePositions(BTreeNode root) {
+    private Map<BTreeNode, NodePosition> calculatePositions(BTreeNode root, double canvasWidth) {
         Map<BTreeNode, NodePosition> positions = new HashMap<>();
 
         // Calcular el ancho total necesario para cada subárbol
         Map<BTreeNode, Double> subtreeWidths = new HashMap<>();
         calculateSubtreeWidths(root, subtreeWidths);
 
-        // Posicionar nodos centrados mejor
-        positionNodeAdvanced(root, 500, 45, positions, subtreeWidths);
+        // Posicionar nodos centrados en el canvas
+        positionNodeAdvanced(root, canvasWidth / 2, 45, positions, subtreeWidths);
 
         return positions;
     }
@@ -196,10 +246,10 @@ public class TreeVisualizer {
 
         double totalWidth;
         if (leftWidth == 0 && rightWidth == 0) {
-            // Nodo hoja
-            totalWidth = MIN_HORIZONTAL_SPACING * 0.7; // Más compacto para hojas
+            // Nodo hoja - más compacto
+            totalWidth = MIN_HORIZONTAL_SPACING * 0.7;
         } else {
-            // Nodo interno: suma más controlada
+            // Nodo interno - suma controlada
             totalWidth = leftWidth + rightWidth + (MIN_HORIZONTAL_SPACING * 0.6);
         }
 
@@ -221,8 +271,8 @@ public class TreeVisualizer {
             double leftWidth = subtreeWidths.getOrDefault(node.left, (double)MIN_HORIZONTAL_SPACING);
             double rightWidth = subtreeWidths.getOrDefault(node.right, (double)MIN_HORIZONTAL_SPACING);
 
-            // Separación más controlada
-            double separation = Math.max(MIN_HORIZONTAL_SPACING * 0.8, Math.min(leftWidth, rightWidth) / 2.0);
+            // Separación más controlada pero aumentada para evitar superposiciones
+            double separation = Math.max(MIN_HORIZONTAL_SPACING * 0.8, Math.min(leftWidth, rightWidth) / 2.2);
 
             double leftX = x - separation;
             double rightX = x + separation;
@@ -232,11 +282,11 @@ public class TreeVisualizer {
 
         } else if (node.left != null) {
             // Solo hijo izquierdo
-            positionNodeAdvanced(node.left, x - MIN_HORIZONTAL_SPACING / 2.5, nextY, positions, subtreeWidths);
+            positionNodeAdvanced(node.left, x - MIN_HORIZONTAL_SPACING / 2.8, nextY, positions, subtreeWidths);
 
         } else if (node.right != null) {
             // Solo hijo derecho
-            positionNodeAdvanced(node.right, x + MIN_HORIZONTAL_SPACING / 2.5, nextY, positions, subtreeWidths);
+            positionNodeAdvanced(node.right, x + MIN_HORIZONTAL_SPACING / 2.8, nextY, positions, subtreeWidths);
         }
     }
 
@@ -264,13 +314,14 @@ public class TreeVisualizer {
         }
     }
 
-    private void drawConnections(Pane pane, BTreeNode node, Map<BTreeNode, NodePosition> positions, java.util.Set<BTreeNode> drawnNodes) {
-        if (node == null || drawnNodes.contains(node)) return;
+    // MÉTODO CORREGIDO: Solo dibuja conexiones directas padre-hijo
+    private void drawConnections(Pane pane, BTreeNode node, Map<BTreeNode, NodePosition> positions) {
+        if (node == null) return;
 
-        drawnNodes.add(node);
         NodePosition currentPos = positions.get(node);
+        if (currentPos == null) return;
 
-        // Dibujar línea al hijo izquierdo (solo si existe y no se ha dibujado)
+        // Dibujar línea al hijo izquierdo (solo si existe)
         if (node.left != null) {
             NodePosition leftPos = positions.get(node.left);
             if (leftPos != null) {
@@ -280,11 +331,9 @@ public class TreeVisualizer {
                 line.setStrokeWidth(2.5);
                 pane.getChildren().add(line);
             }
-
-            drawConnections(pane, node.left, positions, drawnNodes);
         }
 
-        // Dibujar línea al hijo derecho (solo si existe y no se ha dibujado)
+        // Dibujar línea al hijo derecho (solo si existe)
         if (node.right != null) {
             NodePosition rightPos = positions.get(node.right);
             if (rightPos != null) {
@@ -294,17 +343,19 @@ public class TreeVisualizer {
                 line.setStrokeWidth(2.5);
                 pane.getChildren().add(line);
             }
-
-            drawConnections(pane, node.right, positions, drawnNodes);
         }
+
+        // Continuar recursivamente con los hijos
+        drawConnections(pane, node.left, positions);
+        drawConnections(pane, node.right, positions);
     }
 
-    private void drawLevelLines(Pane pane, int maxHeight) {
+    private void drawLevelLines(Pane pane, int maxHeight, double canvasWidth) {
         for (int level = 0; level <= maxHeight; level++) {
             double y = 45 + (level * LEVEL_HEIGHT);
 
             // Línea horizontal del nivel
-            Line levelLine = new Line(30, y, 970, y);
+            Line levelLine = new Line(30, y, canvasWidth - 30, y);
             levelLine.setStroke(LEVEL_LINE_COLOR);
             levelLine.setStrokeWidth(1.5);
             levelLine.getStrokeDashArray().addAll(8d, 4d);

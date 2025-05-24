@@ -30,7 +30,7 @@ public class BtreeTourController {
         btree = new BTree();
         visualizer = new TreeVisualizer();
 
-        // Encontrar el ScrollPane y obtener su content pane
+        // Encontrar el ScrollPane y configurarlo
         javafx.scene.control.ScrollPane scrollPane = null;
         for (javafx.scene.Node node : mainPain.getChildren()) {
             if (node instanceof Pane) {
@@ -46,8 +46,14 @@ public class BtreeTourController {
 
         if (scrollPane != null) {
             treePane = new Pane();
-            treePane.setPrefSize(1000, 650); // Tamaño balanceado
+            // NO establecer tamaño fijo - se ajustará dinámicamente
             scrollPane.setContent(treePane);
+
+            // Configurar el ScrollPane para mejor funcionamiento
+            scrollPane.setFitToWidth(false);
+            scrollPane.setFitToHeight(false);
+            scrollPane.setHbarPolicy(javafx.scene.control.ScrollPane.ScrollBarPolicy.AS_NEEDED);
+            scrollPane.setVbarPolicy(javafx.scene.control.ScrollPane.ScrollBarPolicy.AS_NEEDED);
         }
 
         // Generar árbol inicial
