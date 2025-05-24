@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.paint.LinearGradient?>
+<?import javafx.scene.paint.Stop?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane prefHeight="674.0" prefWidth="784.0" style="-fx-background-color: linear-gradient(from 0.0% 0.0% to 100.0% 100.0%, #384463 0.0%, #343336 100.0%);" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.GraphicBtreeController">
+   <children>
+      <Pane fx:id="mainPain" prefHeight="719.0" prefWidth="784.0">
+         <children>
+            <Pane prefHeight="83.0" prefWidth="784.0" style="-fx-background-color: linear-gradient(from 0.0% 0.0% to 100.0% 100.0%, #384463 0.0%, #343336 100.0%);">
+               <children>
+                  <Text fx:id="txtMessage" layoutY="57.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Graphic Binary Tree" textAlignment="CENTER" wrappingWidth="784.0">
+                     <font>
+                        <Font name="Serif Regular" size="47.0" />
+                     </font>
+                     <fill>
+                        <LinearGradient endX="1.0" endY="1.0">
+                           <stops>
+                              <Stop>
+                                 <color>
+                                    <Color red="0.5260721445083618" green="0.6059494614601135" blue="0.8947368264198303" />
+                                 </color>
+                              </Stop>
+                              <Stop offset="0.6280487804878049">
+                                 <color>
+                                    <Color red="1.0" green="1.0" blue="1.0" />
+                                 </color>
+                              </Stop>
+                              <Stop offset="0.6310975609756098">
+                                 <color>
+                                    <Color red="1.0" green="1.0" blue="1.0" />
+                                 </color>
+                              </Stop>
+                              <Stop offset="1.0">
+                                 <color>
+                                    <Color red="1.0" green="1.0" blue="1.0" />
+                                 </color>
+                              </Stop>
+                           </stops>
+                        </LinearGradient>
+                     </fill>
+                  </Text>
+               </children>
+            </Pane>
+            <Pane layoutY="83.0" prefHeight="637.0" prefWidth="784.0" style="-fx-background-color: radial-gradient(focus-angle 0.0deg, focus-distance 11.4943% , center 50.0% 50.0%, radius 59.1954%, #ffffff 0.0%, #8f99b5 100.0%);">
+               <children>
+                  <Pane fx:id="buttonPane11" layoutY="14.0" prefHeight="53.0" prefWidth="784.0" style="-fx-background-color: linear-gradient(from 0.0% 0.0% to 100.0% 100.0%, #384463 0.0%, #343336 100.0%);">
+                     <children>
+                        <Button fx:id="randomButton" layoutX="141.0" layoutY="8.0" mnemonicParsing="false" onAction="#randomizeOnAction" onMousePressed="#pressedRandom" prefHeight="37.0" prefWidth="156.0" style="-fx-background-radius: 15;" text="Randomize">
+                           <font>
+                              <Font name="Arial" size="20.0" />
+                           </font>
+                        </Button>
+                        <Button layoutX="329.0" layoutY="8.0" mnemonicParsing="false" onAction="#levelsOnAction" onMousePressed="#pressedRandom" prefHeight="37.0" prefWidth="126.0" style="-fx-background-radius: 15;" text="Levels">
+                           <font>
+                              <Font name="Arial" size="20.0" />
+                           </font>
+                        </Button>
+                        <Button layoutX="488.0" layoutY="8.0" mnemonicParsing="false" onAction="#tourInfoOnAction" onMousePressed="#pressedRandom" prefHeight="37.0" prefWidth="149.0" style="-fx-background-radius: 15;" text="Tour Info">
+                           <font>
+                              <Font name="Arial" size="20.0" />
+                           </font>
+                        </Button>
+                     </children>
+                  </Pane>
+                  <ScrollPane layoutX="37.0" layoutY="85.0" prefHeight="520.0" prefWidth="711.0">
+                    <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0" />
+                    </content>
+                  </ScrollPane>
+               </children>
+            </Pane>
+         </children>
+      </Pane>
+   </children>
+</AnchorPane>
