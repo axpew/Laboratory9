@@ -85,7 +85,7 @@
                         </Button>
                      </children>
                   </Pane>
-                  <ScrollPane layoutX="37.0" layoutY="85.0" prefHeight="520.0" prefWidth="711.0" />
+                  <ScrollPane layoutY="85.0" prefHeight="532.0" prefWidth="769.0" />
                </children>
             </Pane>
          </children>

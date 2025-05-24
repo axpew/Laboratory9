@@ -70,7 +70,7 @@
                         </Button>
                      </children>
                   </Pane>
-                  <ScrollPane layoutX="37.0" layoutY="85.0" prefHeight="520.0" prefWidth="711.0">
+                  <ScrollPane layoutX="1.0" layoutY="85.0" prefHeight="532.0" prefWidth="769.0">
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0" />
                     </content>
